@@ -84,10 +84,6 @@ blogsRouter.post("/", async (request, response) => {
 blogsRouter.delete("/:id", async (request, response) => {
   const { id } = request.params;
 
-  if (!isValidElement(id)) {
-    return response.status(400).json({ error: "InvalidID format" });
-  }
-
   const user = request.user;
 
   if (user) {

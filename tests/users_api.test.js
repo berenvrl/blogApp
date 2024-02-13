@@ -67,7 +67,7 @@ describe("when there is initially one user in db", () => {
 
 describe("using invalid info", () => {
   test("returns an error with 400 status code if password < 3 characters long", async () => {
-    const usersAtFirst = helper.usersInDb();
+    const usersAtFirst = await helper.usersInDb();
 
     const newUser = {
       username: "john_hi",
@@ -77,13 +77,13 @@ describe("using invalid info", () => {
 
     const response = await api.post("/api/users").send(newUser).expect(400);
 
-    const usersAtFinal = helper.usersInDb();
+    const usersAtFinal = await helper.usersInDb();
 
     expect(usersAtFirst).toEqual(usersAtFinal);
-  }, 100000);
+  });
 
   test("returns an error with 400 status code if username < 3 characters long", async () => {
-    const usersAtFirst = helper.usersInDb();
+    const usersAtFirst = await helper.usersInDb();
 
     const newUser = {
       username: "jo",
@@ -93,7 +93,7 @@ describe("using invalid info", () => {
 
     const response = await api.post("/api/users").send(newUser).expect(400);
 
-    const usersAtFinal = helper.usersInDb();
+    const usersAtFinal = await helper.usersInDb();
 
     expect(usersAtFirst).toEqual(usersAtFinal);
   });
