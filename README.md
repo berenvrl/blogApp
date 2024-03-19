@@ -44,7 +44,14 @@ Backend Code, [BlogApp Backend](https://github.com/berenvrl/blogApp)
 
 Test Project, [BlogApp Test](https://github.com/berenvrl/blogApp-CypressTest)
 
+# Whole Project
+
 Deployed project as whole, [BlogApp FullStack Project](https://blogapp-7777.onrender.com/)
+
+To login, please use this credentials:
+username:testUser
+password:test123,
+
 
 # Installation
 
