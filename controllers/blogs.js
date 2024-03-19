@@ -1,7 +1,5 @@
 const blogsRouter = require("express").Router();
-const { isValidElement } = require("react");
 const Blog = require("../models/blog");
-const middleware = require("../utils/middleware");
 const mongoose = require("mongoose");
 
 /*
@@ -16,8 +14,17 @@ const getTokenFrom = (request) => {
 
 // / instead of /api/blogs
 blogsRouter.get("/", async (request, response) => {
-  const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
-  response.json(blogs);
+  const user = request.user;
+
+  if (user) {
+    const blogs = await Blog.find({ user: user._id }).populate("user", {
+      username: 1,
+      name: 1,
+    });
+    response.json(blogs);
+  } else {
+    response.status(400).end();
+  }
 });
 
 // / instead of /api/blogs/:id

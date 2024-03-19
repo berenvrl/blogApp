@@ -25,7 +25,8 @@ loginRouter.post("/", async (request, response) => {
   //creating token for user authentication
   //Due to API user(eg React) gets a token, the API has a blind trust to the token holder. As a solution, limit validty =>one hour
   const token = jwt.sign(userForToken, process.env.SECRET, {
-    expiresIn: 60 * 60,
+    // expiresIn: 60 * 60,
+    expiresIn: 60 * 3600,
   });
 
   response
