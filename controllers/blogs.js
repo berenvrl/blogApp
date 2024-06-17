@@ -1,5 +1,6 @@
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
+const Comment= require('../models/comments')
 const mongoose = require("mongoose");
 
 /*
@@ -20,10 +21,13 @@ blogsRouter.get("/", async (request, response) => {
     const blogs = await Blog.find({ user: user._id }).populate("user", {
       username: 1,
       name: 1,
-    });
+    }).populate("comments",{
+      comment:1,
+      blog:1
+    })
     response.json(blogs);
   } else {
-    response.status(400).end();
+    return response.status(401).json({ error: 'Unauthorised access' });
   }
 });
 
@@ -45,7 +49,6 @@ blogsRouter.get("/:id", async (request, response) => {
 });
 
 // / instead of /api/blogs
-//creating a blog post only if with authorization
 blogsRouter.post("/", async (request, response) => {
   const body = request.body;
   const user = request.user;
@@ -79,7 +82,7 @@ blogsRouter.post("/", async (request, response) => {
         response.status(403).json({ error: "invalid user" });
       }
     } else {
-      return response.status(400).end();
+      return response.status(401).json({error:"Unauthorised access"});
     }
   } else {
     response.status(400).end();
@@ -87,7 +90,6 @@ blogsRouter.post("/", async (request, response) => {
 });
 
 // / instead of /api/blogs/:id
-//creating a blog post only if with authorization
 blogsRouter.delete("/:id", async (request, response) => {
   const { id } = request.params;
 
@@ -112,7 +114,6 @@ blogsRouter.delete("/:id", async (request, response) => {
 });
 
 // / instead of /api/blogs/:id
-//creating a blog post only if with authorization
 blogsRouter.put("/:id", async (request, response) => {
   const { title, author, url, likes } = request.body;
   const id = request.params.id;
@@ -135,7 +136,72 @@ blogsRouter.put("/:id", async (request, response) => {
   }
 });
 
+
+//for making comments for a spesific blog
+
+//instead of /api/blogs/:id/comments
+blogsRouter.post('/:id/comments', async (request, response) => {
+  const { id } = request.params;
+  const body= request.body
+  const user= request.user
+
+  const blog = await Blog.findById(id);
+
+  console.log('blog', blog);
+
+  if (blog && body.comment) {
+    const newComment = await Comment({
+      comment: body.comment,
+      user: user._id,
+    });
+
+    if (user) {
+      if (newComment.user.toString() === user._id.toString()) {
+        const savedComment = await newComment.save();
+
+        console.log('saved Comment', savedComment);
+
+        user.comments = user.comments.concat(savedComment._id);
+
+        blog.comments = blog.comments.concat(savedComment);
+
+        await user.save();
+        await blog.save();
+
+        response.status(201).json(savedComment);
+      } else {
+        response.status(403).json({ error: 'Invalid user' });
+      }
+    } else {
+      return response.status(401).json({ error: 'Unauthorised access' });
+    }
+  } else {
+    response.status(404).end();
+  }
+});
+// / instead of /api/blogs/:id/comments
+blogsRouter.get("/:id/comments", async (request, response) => {
+  const { id } = request.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return response.status(400).json({ error: "Invalid ID" });
+  } else {
+    const blog = await Blog.findById(id).populate('comments',{
+      comment:1
+    })
+
+    if (blog) {
+      response.json(blog);
+    } else {
+      response.status(404).end();
+    }
+  }
+});
+
+
+
 module.exports = blogsRouter;
+
 
 //NOTES
 /*

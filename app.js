@@ -31,10 +31,11 @@ app.use(
   "/api/blogs",
   middleware.tokenExtractor,
   middleware.userExtractor,
-  blogsRouter
+  blogsRouter,
 );
 app.use("/api/users", usersRouter);
 app.use("/api/login", middleware.tokenExtractor, loginRouter);
+
 
 //emptying db in test mode
 // /api/testing/reset empties db
@@ -46,7 +47,11 @@ if(process.env.NODE_ENV === 'test'){
 app.use(middleware.errorHandler);
 app.use(middleware.unknownEndpoint);
 
+
+
 module.exports = app;
+
+
 
 /*
 require("express-async-errors"); =>library for eliminating catch blocks
